@@ -1,0 +1,12 @@
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\bin\Debug\net6.0\NamedParametersSystem.deps.json
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\bin\Debug\net6.0\NamedParametersSystem.dll
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\bin\Debug\net6.0\NamedParametersSystem.pdb
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\NamedParametersSystem.csproj.AssemblyReference.cache
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\NamedParametersSystem.GeneratedMSBuildEditorConfig.editorconfig
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\NamedParametersSystem.AssemblyInfoInputs.cache
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\NamedParametersSystem.AssemblyInfo.cs
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\NamedParametersSystem.csproj.CoreCompileInputs.cache
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\NamedParametersSystem.dll
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\refint\NamedParametersSystem.dll
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\NamedParametersSystem.pdb
+E:\Махортов\Макросы\NamedParametersSystem\NamedParametersSystem\obj\Debug\net6.0\ref\NamedParametersSystem.dll

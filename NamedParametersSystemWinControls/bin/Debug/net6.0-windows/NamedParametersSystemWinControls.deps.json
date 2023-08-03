@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "NamedParametersSystemWinControls/1.0.0": {
+        "dependencies": {
+          "NamedParametersSystem": "1.0.0"
+        },
+        "runtime": {
+          "NamedParametersSystemWinControls.dll": {}
+        }
+      },
+      "NamedParametersSystem/1.0.0": {
+        "runtime": {
+          "NamedParametersSystem.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "NamedParametersSystemWinControls/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NamedParametersSystem/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

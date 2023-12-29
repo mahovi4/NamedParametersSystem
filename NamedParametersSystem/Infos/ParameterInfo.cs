@@ -8,9 +8,12 @@ namespace NamedParametersSystem;
 
 public abstract class ParameterInfo
 {
+    public event ParameterChangesHandler? Change;
+
     public string Name { get; set; }
     public string Description { get; set; }
     public bool ReadOnly { get; set; }
+    public GroupParameter? Group { get; set; }
 
     protected ParameterInfo()
     {

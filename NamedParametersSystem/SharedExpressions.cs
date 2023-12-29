@@ -1,4 +1,6 @@
-﻿namespace NamedParametersSystem;
+﻿using System.Reflection;
+
+namespace NamedParametersSystem;
 
 public static class SharedExpressions
 {
@@ -40,6 +42,12 @@ public static class SharedExpressions
     {
         return type.GetProperties()
             .Any(prop => prop.Name.Equals(propName));
+    }
+
+    public static bool ContainsField(this Type type, string fieldName)
+    {
+        return type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Any(field => field.Name.Equals(fieldName));
     }
 }
 

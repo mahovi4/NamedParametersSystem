@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
-
-namespace NamedParametersSystem;
+﻿namespace NamedParametersSystem;
 
 public sealed class DoubleParameter : 
     Parameter<double, NumericParameterInfo<double>>, 
@@ -46,7 +44,7 @@ public sealed class DoubleParameter :
     public DoubleParameter(NumericParameterInfo<double> info, double value = 0)
     {
         Info = info;
-        Value = value;
+        Value = value == 0 ? Info.DefaultValue : value;
     }
 
     public DoubleParameter() 
@@ -60,6 +58,8 @@ public sealed class DoubleParameter :
         Info.MinValue = info.MinValue;
         Info.Increment = info.Increment;
         Info.DecimalPlaces = info.DecimalPlaces;
+
+        OnChange(Value);
     }
 
     public decimal MinValue => (decimal)Info.MinValue;
@@ -83,4 +83,3 @@ public sealed class DoubleParameter :
         }, parameter.Value);
     }
 }
-

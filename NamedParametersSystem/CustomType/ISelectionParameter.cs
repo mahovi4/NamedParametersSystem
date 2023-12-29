@@ -8,7 +8,7 @@ namespace NamedParametersSystem;
 
 public interface ISelectionParameter : IParameter
 {
-    public Type ElementType { get; }
     public bool IsStatic { get; }
+    public IEnumerable<object> Collection { get; }
 }
 

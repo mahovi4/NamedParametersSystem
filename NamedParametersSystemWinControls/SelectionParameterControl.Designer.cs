@@ -53,6 +53,7 @@
             this.cbValue.Size = new System.Drawing.Size(100, 23);
             this.cbValue.TabIndex = 1;
             this.cbValue.SelectedIndexChanged += new System.EventHandler(this.cbValue_SelectedIndexChanged);
+            this.cbValue.Leave += new System.EventHandler(this.cbValue_Leave);
             // 
             // SelectionParameterControl
             // 

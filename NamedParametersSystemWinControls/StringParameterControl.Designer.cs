@@ -51,7 +51,7 @@
             this.tbValue.Name = "tbValue";
             this.tbValue.Size = new System.Drawing.Size(100, 23);
             this.tbValue.TabIndex = 1;
-            this.tbValue.TextChanged += new System.EventHandler(this.tbValue_TextChanged);
+            this.tbValue.Leave += new System.EventHandler(this.tbValue_Leave);
             // 
             // StringParameterControl
             // 

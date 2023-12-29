@@ -20,24 +20,25 @@ public sealed class BoolParameter :
         }
     }
 
-    public BoolParameter(CustomParameterInfo<bool> info)
-    {
-        Info = info;
-        Value = Info.DefaultValue;
-    }
+    public BoolParameter(CustomParameterInfo<bool> info) 
+        :this(info, info.DefaultValue) 
+    { }
+
     public BoolParameter(CustomParameterInfo<bool> info, bool value)
     {
         Info = info;
         Value = value;
     }
     public BoolParameter()
-        : this(new CustomParameterInfo<bool>()){}
+        : this(new CustomParameterInfo<bool>(false)){}
 
     public override void ChangeInfo(CustomParameterInfo<bool> info)
     {
         Info.ReadOnly = info.ReadOnly;
         Info.DefaultValue = info.DefaultValue;
         Info.ForbiddenValues = info.ForbiddenValues;
+
+        OnChange(Value);
     }
 }
 

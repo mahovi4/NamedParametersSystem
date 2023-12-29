@@ -24,6 +24,8 @@ public partial class BoolParameterControl : UserControl, IParameterControl
         if (parameter is not BoolParameter boolPar)
             throw new ArgumentException($"Параметр '{parameter}' не является логическим!");
 
+        param.Change -= OnChange;
+
         param = boolPar;
 
         ttMain.RemoveAll();
@@ -34,16 +36,17 @@ public partial class BoolParameterControl : UserControl, IParameterControl
         cbValue.Checked = param.Value;
 
         ttMain.SetToolTip(cbValue, param.Info.Description);
+
+        param.Change += OnChange;
     }
 
     private void cbValue_CheckedChanged(object sender, EventArgs e)
     {
         param.Value = cbValue.Checked;
-        OnChange(cbValue.Checked);
     }
 
-    private void OnChange(object value)
+    private void OnChange(string paramName, object value)
     {
-        Change?.Invoke(param.Name, value);
+        Change?.Invoke(paramName, value);
     }
 }

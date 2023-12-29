@@ -7,6 +7,7 @@ public abstract class Parameter<TParameterizedType, TParameterInfo> : IParameter
     public event ParameterChangesHandler? Change;
 
     public abstract TParameterInfo Info { get; }
+
     public abstract TParameterizedType Value { get; set; }
 
     public abstract void ChangeInfo(TParameterInfo info);
@@ -14,10 +15,11 @@ public abstract class Parameter<TParameterizedType, TParameterInfo> : IParameter
     public string Name => Info.Name;
     public string Description => Info.Description;
     public bool ReadOnly => Info.ReadOnly;
+    public GroupParameter? Group => Info.Group;
 
     public object ToObj()
     {
-        return Value;
+        return Value ?? throw new ArgumentNullException();
     }
 
     public void FromObj(object value)

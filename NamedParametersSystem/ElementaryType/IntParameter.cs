@@ -62,6 +62,8 @@ public sealed class IntParameter :
         Info.MinValue = info.MinValue;
         Info.DecimalPlaces = info.DecimalPlaces;
         Info.Increment = info.Increment;
+
+        OnChange(Value);
     }
 
     public decimal MinValue => Info.MinValue;

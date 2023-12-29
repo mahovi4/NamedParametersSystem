@@ -14,6 +14,7 @@ namespace NamedParametersSystemWinControls
         private ICustomTypeParameter? param;
 
         private readonly List<IParameterControl> parControls = new();
+        private int maxLabelWidth = 0;
 
         public CustomParameterControl()
         {
@@ -27,6 +28,7 @@ namespace NamedParametersSystemWinControls
                 throw new ArgumentException();
 
             param = ctParam;
+            Controls.Clear();
             parControls.Clear();
             ttMain.RemoveAll();
             ControlName = param.Name;
@@ -34,20 +36,11 @@ namespace NamedParametersSystemWinControls
             Width = 200;
             Height = 130;
 
-            var maxLabelWidth = 0;
-            var pars = param.ParamValue;
-            foreach (var par in param.ParamValue.Parameters)
-            {
-                var width = TextRenderer.MeasureText(par.Name + ": ", new Label().Font).Width;
-                if(width > maxLabelWidth)
-                    maxLabelWidth = width;
-            }
-
-            //var maxLabelWidth = ctParam.ParamValue.Parameters
-            //    .Select(par =>
-            //        TextRenderer.MeasureText(par.Name + ": ", new Label().Font).Width)
-            //    .Prepend(0)
-            //    .Max();
+            maxLabelWidth = ctParam.ParamValue.Parameters
+                .Select(par =>
+                    TextRenderer.MeasureText(par.Name + ": ", new Label().Font).Width)
+                .Prepend(0)
+                .Max();
 
             var cList = new List<Control>();
             foreach (var par in ctParam.ParamValue.Parameters)
@@ -57,38 +50,40 @@ namespace NamedParametersSystemWinControls
                     case INumericParameter:
                         var nControl = new NumericParameterControl();
                         nControl.Init(par, maxLabelWidth);
+                        nControl.Enabled = !par.ReadOnly;
                         parControls.Add(nControl);
                         nControl.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-                        nControl.Change += OnChange;
                         cList.Add(nControl);
                         break;
                     case BoolParameter bParam:
                         var bControl = new BoolParameterControl();
                         bControl.Init(bParam, maxLabelWidth);
+                        bControl.Enabled = !bParam.ReadOnly;
                         parControls.Add(bControl);
                         bControl.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-                        bControl.Change += OnChange;
                         cList.Add(bControl);
                         break;
                     case StringParameter sParam:
                         var sControl = new StringParameterControl();
                         sControl.Init(sParam, maxLabelWidth);
+                        sControl.Enabled = !sParam.ReadOnly;
+                        sControl.Change += OnChange;
                         parControls.Add(sControl);
                         sControl.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-                        sControl.Change += OnChange;
                         cList.Add(sControl);
                         break;
                     case ISelectionParameter:
                         var selControl = new SelectionParameterControl();
                         selControl.Init(par, maxLabelWidth);
+                        selControl.Enabled = !par.ReadOnly;
                         parControls.Add(selControl);
                         selControl.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-                        selControl.Change += OnChange;
                         cList.Add(selControl);
                         break;
                     case ICollectionParameter:
                         var cControl = new CollectionParameterControl();
                         cControl.Init(par, maxLabelWidth);
+                        cControl.Enabled = !par.ReadOnly;
                         parControls.Add(cControl);
                         cControl.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
                         var gb = new GroupBox
@@ -100,13 +95,13 @@ namespace NamedParametersSystemWinControls
                         };
                         cControl.Left = 5;
                         cControl.Top = 16;
-                        cControl.Change += OnChange;
                         gb.Controls.Add(cControl);
                         cList.Add(gb);
                         break;
                     case ICustomTypeParameter:
                         var tControl = new CustomParameterControl();
                         tControl.Init(par, maxLabelWidth);
+                        tControl.Enabled = !par.ReadOnly;
                         parControls.Add(tControl);
                         tControl.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
                         gb = new GroupBox
@@ -118,7 +113,6 @@ namespace NamedParametersSystemWinControls
                         };
                         tControl.Left = 5;
                         tControl.Top = 16;
-                        tControl.Change += OnChange;
                         gb.Controls.Add(tControl);
                         cList.Add(gb);
                         break;
@@ -147,12 +141,47 @@ namespace NamedParametersSystemWinControls
                 Controls.Add(control);
                 y += control.Height + 5;
             }
+
+            //Refresh();
         }
 
+        private void ReInit()
+        {
+            if(param is null) return;
+
+            //foreach(var par in param.ParamValue.Parameters)
+            //    foreach(var control in parControls)
+            //        if(control.ControlName.Equals(par.Name))
+            //            control.Init(par, maxLabelWidth);
+
+            foreach (var control in parControls)
+                control.Change -= OnChange;
+
+            foreach (var control in Controls)
+                ((Control) control).Dispose();
+
+            Controls.Clear();
+
+            Init(param, maxLabelWidth);
+
+            Refresh();
+        }
 
         private void OnChange(string paramName, object value)
         {
-            param?.ParamValue.SetParameter(paramName, value);
+            //var par = param?.ParamValue.GetParameter(paramName) ?? throw new ArgumentException();
+
+            //foreach (var control in parControls)
+            //    if(control.ControlName.Equals(paramName))
+            //        control.Init(par, maxLabelWidth);
+
+            //if (!param?.ParamValue.GetParameter(paramName).Equals(value) ?? throw new ArgumentException())
+            //{
+            //param?.ParamValue.SetParameter(paramName, value);
+            //Init(param ?? throw new ArgumentException());
+            Change?.Invoke(paramName, value);
+            ReInit();
+            //}
         }
     }
 }

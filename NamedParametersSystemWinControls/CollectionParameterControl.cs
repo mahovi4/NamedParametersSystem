@@ -53,10 +53,9 @@ namespace NamedParametersSystemWinControls
             var par = dlg.Control?.Parameter.ToObj();
 
             if (par is null) return;
-
             lbList.Items.Add(par);
 
-            param.FromObj(lbList.Items.Cast<object>());
+            param.Add(par);
 
             OnChange(param.ToObj());
         }

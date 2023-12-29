@@ -1,4 +1,6 @@
-﻿namespace NamedParametersSystem;
+﻿using System.Reflection;
+
+namespace NamedParametersSystem;
 
 public abstract class ParametrizedType : IParameterizedType
 {
@@ -13,28 +15,62 @@ public abstract class ParametrizedType : IParameterizedType
     }
     public void SetParameter(string paramName, object value)
     {
-        if (!this.ContainsParameter(paramName) && !GetType().ContainsProperty(paramName))
+        bool isField = false, 
+            isProp = false, 
+            isParam = false;
+
+        isParam = this.ContainsParameter(paramName);
+
+        if(!isParam)
+            isProp = GetType().ContainsProperty(paramName);
+
+        if(!isParam && !isProp)
+            isField = GetType().ContainsField(paramName);
+
+        if (!isParam && !isProp && !isField)
         {
             OnError(paramName, $"Параметр с именем '{paramName}' не найден!");
             return;
         }
 
-        foreach (var prop in GetType().GetProperties())
-            if (prop.CanRead && prop.PropertyType.CheckOnInterface("IParameter"))
-            {
-                var val = prop.GetValue(this);
-                if (val is not IParameter param)
+        if (isParam) 
+            foreach(var param in Parameters)
+                if(param.Name == paramName)
+                    param.FromObj(value);
+        
+
+        if (isProp)
+            foreach (var prop in GetType().GetProperties())
+                if (prop.Name == paramName)
                 {
-                    OnError(paramName, $"Параметр '{paramName}' вернул нулевое значение");
-                    return;
+                    var val = prop.GetValue(this);
+                    if (val is null)
+                        throw new ArgumentNullException();
+
+                    ((IParameter)val).FromObj(value);
+                    prop.SetValue(this, val);
                 }
 
-                if (!param.Name.Equals(paramName) && !prop.Name.Equals(paramName)) continue;
 
-                param.Error += OnError;
-                param.Change += OnChange;
-                param.FromObj(value);
-            }
+        if(isField)
+            foreach(var field in GetType().GetFields(
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                if (field.Name == paramName)
+                {
+                    var val = field.GetValue(this);
+                    if(val is null)
+                        throw new ArgumentNullException();
+
+                    ((IParameter)val).FromObj(value);
+                    field.SetValue(this, val);
+                }
+    }
+    public IParameter GetParameter(string paramName)
+    {
+        foreach(var param in Parameters)
+            if (param.Name.Equals(paramName))
+                return param;
+        throw new ArgumentException();
     }
 
     public object ToObj() => this;
@@ -48,11 +84,12 @@ public abstract class ParametrizedType : IParameterizedType
 
     private IEnumerable<IParameter> GetParameters()
     {
-        return from prop in GetType().GetProperties() 
-            where prop.CanRead && prop.PropertyType.CheckOnInterface("IParameter") 
-            select prop.GetValue(this)
-            into val where val is not null 
-            select (IParameter) val;
+        var list = new List<IParameter>();
+
+        list.AddRange(SearchInFields());
+        list.AddRange(SearchInProperties());
+
+        return list;
     }
 
     protected void OnError(string paramName, string message)
@@ -62,6 +99,48 @@ public abstract class ParametrizedType : IParameterizedType
     protected void OnChange(string paramName, object newValue)
     {
         Change?.Invoke(paramName, newValue);
+    }
+    
+    private IEnumerable<IParameter> SearchInFields()
+    {
+        var list = new List<IParameter>();
+
+        list.AddRange(from field in GetType().BaseType?.GetFields(
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) 
+            where field.FieldType.CheckOnInterface("IParameter") 
+            select field.GetValue(this) 
+            into val where val is not null 
+            select (IParameter)val);
+
+        list.AddRange(from field in GetType().GetFields(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) 
+            where field.FieldType.CheckOnInterface("IParameter") 
+            select field.GetValue(this) 
+            into val where val is not null 
+            select (IParameter)val);
+
+        return list;
+    }
+
+    private IEnumerable<IParameter> SearchInProperties()
+    {
+        var list = new List<IParameter>();
+
+        list.AddRange(from field in GetType().BaseType?.GetProperties()
+            where field.PropertyType.CheckOnInterface("IParameter")
+            select field.GetValue(this)
+            into val
+            where val is not null
+            select (IParameter)val);
+
+        list.AddRange(from field in GetType().GetProperties()
+            where field.PropertyType.CheckOnInterface("IParameter")
+            select field.GetValue(this)
+            into val
+            where val is not null
+            select (IParameter)val);
+
+        return list;
     }
 }
 

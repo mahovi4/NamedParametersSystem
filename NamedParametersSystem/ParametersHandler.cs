@@ -1,45 +1,44 @@
 ﻿using System.Reflection;
 
-namespace NamedParametersSystem
+namespace NamedParametersSystem;
+
+public static class ParametersHandler
 {
-    public static class ParametersHandler
+    public static IParameterizedType GetDefaultValue(this Type type)
     {
-        public static IParameterizedType GetDefaultValue(this Type type)
-        {
-            if (!type.CheckOnInterface("IParameterizedType"))
-                throw new ArgumentException("Указанный тип не реализует интерфейс 'IParameterizedType'");
+        if (!type.CheckOnInterface("IParameterizedType"))
+            throw new ArgumentException("Указанный тип не реализует интерфейс 'IParameterizedType'");
 
-            if (type.IsAbstract && type.IsSealed)
-                return (IParameterizedType)type
-                    .GetProperty("DefaultValue", BindingFlags.Public | BindingFlags.Static, 
-                        null, type, Type.EmptyTypes, Array.Empty<ParameterModifier>())
-                    ?.GetValue(null)! 
-                       ?? throw new ArgumentException("Указанный тип не имеет статического свойства 'DefaultValue'");
-
+        if (type.IsAbstract)
             return (IParameterizedType)type
-                .GetConstructor(BindingFlags.Instance | BindingFlags.Public, Array.Empty<Type>())
-                ?.Invoke(Array.Empty<object>())! 
-                   ?? throw new ArgumentException("Указанный тип не имеет конструктора без параметров");
-        }
+                .GetProperty("DefaultValue", BindingFlags.Public | BindingFlags.Static,
+                    null, type, Type.EmptyTypes, Array.Empty<ParameterModifier>())
+                ?.GetValue(null)!
+                   ?? throw new ArgumentException("Указанный тип не имеет статического свойства 'DefaultValue'");
 
-        public static bool ContainsParameter(this IParameterizedType obj, string paramName)
-        {
-            return obj.Parameters
-                .Any(param => param.Name.Equals(paramName));
-        }
+        return (IParameterizedType)type
+            .GetConstructor(BindingFlags.Instance | BindingFlags.Public, Array.Empty<Type>())
+            ?.Invoke(Array.Empty<object>())!
+               ?? throw new ArgumentException("Указанный тип не имеет конструктора без параметров");
+    }
 
-        public static IEnumerable<object> GetChild(this Type type)
-        {
-            if(!type.CheckOnInterface("IParameterizedType"))
-                throw new ArgumentException("Указанный тип не реализует интерфейс 'IParameterizedType'");
+    public static bool ContainsParameter(this IParameterizedType obj, string paramName)
+    {
+        return obj.Parameters
+            .Any(param => param.Name.Equals(paramName));
+    }
 
-            var collection = type
-                .GetMethod("GetChild", BindingFlags.Public | BindingFlags.Static, Array.Empty<Type>())
-                ?.Invoke(null, null);
+    public static IEnumerable<object> GetChild(this Type type)
+    {
+        if (!type.CheckOnInterface("IParameterizedType"))
+            throw new ArgumentException("Указанный тип не реализует интерфейс 'IParameterizedType'");
 
-            return collection is not IEnumerable<object> col 
-                ? new List<object>() 
-                : col;
-        }
+        var collection = type
+            .GetMethod("GetChild", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, Array.Empty<Type>())
+            ?.Invoke(null, null);
+
+        return collection is not IEnumerable<object> col
+            ? new List<object>()
+            : col;
     }
 }

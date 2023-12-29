@@ -31,13 +31,15 @@ public sealed class CustomTypeParameter<TParameterizedType> :
     }
 
     public CustomTypeParameter()
-        : this(new CustomParameterInfo<TParameterizedType>()) { }
+        : this(new CustomParameterInfo<TParameterizedType>((TParameterizedType)typeof(TParameterizedType).GetDefaultValue())) { }
 
     public override void ChangeInfo(CustomParameterInfo<TParameterizedType> info)
     {
         Info.ReadOnly = info.ReadOnly;
         Info.DefaultValue = info.DefaultValue;
         Info.ForbiddenValues = info.ForbiddenValues;
+
+        OnChange(Value);
     }
 
     public IParameterizedType ParamValue => Value;

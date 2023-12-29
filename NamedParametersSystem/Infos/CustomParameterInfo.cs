@@ -1,4 +1,6 @@
-﻿namespace NamedParametersSystem;
+﻿using System.Text.RegularExpressions;
+
+namespace NamedParametersSystem;
 
 public sealed class CustomParameterInfo<TParameterizedType> : ParameterInfo
 {
@@ -6,10 +8,13 @@ public sealed class CustomParameterInfo<TParameterizedType> : ParameterInfo
 
     public IEnumerable<TParameterizedType> ForbiddenValues { get; set; }
 
-    public CustomParameterInfo(TParameterizedType? defaultValue = default)
+    public string RegularExpression { get; set; }
+
+    public CustomParameterInfo(TParameterizedType defaultValue)
     {
-        DefaultValue = defaultValue ?? (TParameterizedType)typeof(TParameterizedType).GetDefaultValue();
+        DefaultValue = defaultValue;
         ForbiddenValues = Array.Empty<TParameterizedType>();
+        RegularExpression = "";
     }
 }
 

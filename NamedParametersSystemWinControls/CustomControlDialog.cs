@@ -17,6 +17,9 @@ namespace NamedParametersSystemWinControls
 
         public void Init(IParameterControl control, IParameter parameter)
         {
+            if (Control is not null) 
+                Control.Change -= OnCtrlChanged;
+
             Control = control;
             Control.Init(parameter);
 
@@ -29,6 +32,8 @@ namespace NamedParametersSystemWinControls
             ((Control)Control).Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
             scMain.Panel1.Controls.Clear();
             scMain.Panel1.Controls.Add((Control)Control);
+
+            Control.Change += OnCtrlChanged;
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -39,6 +44,12 @@ namespace NamedParametersSystemWinControls
         private void btnCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
+        }
+
+        private void OnCtrlChanged(string paramName, object newValue)
+        {
+            Init(Control!, Control!.Parameter);
+            //Refresh();
         }
     }
 }

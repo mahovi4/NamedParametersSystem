@@ -8,8 +8,19 @@ namespace NamedParametersSystem;
 
 public interface ICollectionParameter : IParameter
 {
+    public int Count { get; }
+
     public int LimitCount { get; }
 
-    public IParameter ElementParameter { get; }
-}
+    public void Add(object element);
 
+    public void Remove(object element);
+
+    public void Clear();
+
+    public IParameter ElementParameter { get; }
+
+    public IEnumerable<object> ObjValue { get; set; }
+
+    public object this[int index] { get; set; }
+}

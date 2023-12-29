@@ -25,6 +25,8 @@ namespace NamedParametersSystemWinControls
             if (parameter is not INumericParameter numParam)
                 throw new ArgumentException($"Параметр '{parameter}' не является числовым!");
 
+            param.Change -= OnChange;
+
             param = (DoubleParameter)numParam;
 
             ttMain.RemoveAll();
@@ -52,17 +54,18 @@ namespace NamedParametersSystemWinControls
 
             ttMain.SetToolTip(lName, param.Description);
             ttMain.SetToolTip(nudValue, param.Description);
+
+            param.Change += OnChange;
         }
 
-        private void nudValue_ValueChanged(object sender, EventArgs e)
+        private void OnChange(string paramName, object value)
+        {
+            Change?.Invoke(paramName, value);
+        }
+
+        private void nudValue_Leave(object sender, EventArgs e)
         {
             param.Value = (double)nudValue.Value;
-            OnChange(nudValue.Value);
-        }
-
-        private void OnChange(object value)
-        {
-            Change?.Invoke(param.Name, value);
         }
     }
 }

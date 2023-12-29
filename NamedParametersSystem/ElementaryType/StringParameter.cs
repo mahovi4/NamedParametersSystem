@@ -1,4 +1,6 @@
-﻿namespace NamedParametersSystem;
+﻿using System.Text.RegularExpressions;
+
+namespace NamedParametersSystem;
 
 public sealed class StringParameter : 
     Parameter<string, CustomParameterInfo<string>>, 
@@ -18,6 +20,13 @@ public sealed class StringParameter :
                 OnError($"Значение {value} является не допустимым для данного параметра");
                 return;
             }
+
+            if (!Info.RegularExpression.Equals(""))
+                if (!Regex.IsMatch(value, Info.RegularExpression, RegexOptions.IgnoreCase))
+                {
+                    OnError($"Значение {value} является не допустимым для данного параметра");
+                    return;
+                }
 
             if(val is null || !val.Equals(value))
                 OnChange(value);
@@ -39,6 +48,8 @@ public sealed class StringParameter :
         Info.ReadOnly = info.ReadOnly;
         Info.DefaultValue = info.DefaultValue;
         Info.ForbiddenValues = info.ForbiddenValues;
+
+        OnChange(Value);
     }
 }
 

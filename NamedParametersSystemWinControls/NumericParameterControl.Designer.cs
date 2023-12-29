@@ -52,7 +52,7 @@
             this.nudValue.Name = "nudValue";
             this.nudValue.Size = new System.Drawing.Size(100, 23);
             this.nudValue.TabIndex = 1;
-            this.nudValue.ValueChanged += new System.EventHandler(this.nudValue_ValueChanged);
+            this.nudValue.Leave += new System.EventHandler(this.nudValue_Leave);
             // 
             // NumericParameterControl
             // 

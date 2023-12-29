@@ -9,14 +9,16 @@ namespace NamedParametersSystem;
 public sealed class SelectionParameterInfo<TParameterizedType> : ParameterInfo
 {
     public TParameterizedType DefaultValue { get; set; }
-    public Type ElementType => typeof(TParameterizedType);
     public bool IsStatic { get; set; }
+    public IEnumerable<TParameterizedType> Collection { get; set; }
 
-    public SelectionParameterInfo(TParameterizedType? defaultValue = default, bool isStatic = false)
+    public SelectionParameterInfo(TParameterizedType defaultValue, bool isStatic = false, IEnumerable<TParameterizedType>? collection = null)
     {
-        DefaultValue = defaultValue 
-                       ?? (TParameterizedType)typeof(TParameterizedType).GetDefaultValue();
+        DefaultValue = defaultValue;
+
         IsStatic = isStatic;
+
+        Collection = collection ?? new List<TParameterizedType>();
     }
 }
 

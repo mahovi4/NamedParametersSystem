@@ -1,6 +1,6 @@
 ﻿namespace NamedParametersSystem;
 
-public sealed class CollectionTypeParameter<TParameterizedType> : 
+public sealed class CollectionTypeParameter<TParameterizedType> :
     CollectionParameter<TParameterizedType, CollectionParameterInfo<TParameterizedType>>,
     IParameter, ICollectionParameter
     where TParameterizedType : IParameterizedType
@@ -14,19 +14,20 @@ public sealed class CollectionTypeParameter<TParameterizedType> :
         get => val ?? Info.DefaultValue;
         set
         {
-            if (value.Count > LimitCount)
+            if (LimitCount > 0 && value.Count > LimitCount)
             {
                 OnError($"Количество элементов в списке превышает допустимое в {LimitCount} шт");
                 return;
             }
-            if(val is null || !val.Equals(value))
-                OnChange(value);
+
+            var b = val is null || !val.Equals(value);
 
             val = value;
-        } 
 
+            if(b) OnChange(val);
+        }
     }
-
+    
     public CollectionTypeParameter(CollectionParameterInfo<TParameterizedType> info, IEnumerable<TParameterizedType>? value = default)
     {
         Info = info;
@@ -41,21 +42,13 @@ public sealed class CollectionTypeParameter<TParameterizedType> :
         Info.ReadOnly = info.ReadOnly;
         Info.DefaultValue = info.DefaultValue;
         Info.ElementInfo = info.ElementInfo;
+        Info.LimitCount = info.LimitCount;
+
+        OnChange(Value);
     }
 
-    public int LimitCount => Info.LimitCount;
+    public override int LimitCount => Info.LimitCount;
 
-    public void Add(TParameterizedType element)
-    {
-        if (Value.Count == LimitCount)
-        {
-            OnError($"Текущее количество элементов достигло предела в {LimitCount} элементов");
-            return;
-        }
-        Value.Add(element);
-    }
-
-    public IParameter ElementParameter => 
+    public override IParameter ElementParameter => 
         new CustomTypeParameter<TParameterizedType>(Info.ElementInfo);
 }
-

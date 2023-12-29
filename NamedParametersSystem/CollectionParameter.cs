@@ -1,6 +1,6 @@
 ﻿namespace NamedParametersSystem;
 
-public abstract class CollectionParameter<TParameterizedType, TParameterInfo> : IParameter
+public abstract class CollectionParameter<TParameterizedType, TParameterInfo> : IParameter, ICollectionParameter
     where TParameterInfo : ParameterInfo
 {
     public event ParameterMessageHandler? Error;
@@ -14,6 +14,23 @@ public abstract class CollectionParameter<TParameterizedType, TParameterInfo> : 
     public string Name => Info.Name;
     public string Description => Info.Description;
     public bool ReadOnly => Info.ReadOnly;
+    public GroupParameter? Group => Info.Group;
+
+    public int Count => Value.Count;
+    public abstract int LimitCount { get; }
+
+    public abstract IParameter ElementParameter { get; }
+
+    public IEnumerable<object> ObjValue
+    {
+        get => Value.Cast<object>();
+        set
+        {
+            if (value is not IEnumerable<TParameterizedType> col)
+                throw new ArgumentException($"Параметр '{value}' не является списком элементов '{nameof(TParameterizedType)}'!");
+            Value = col.ToList();
+        }
+    }
 
     public object ToObj()
     {
@@ -32,6 +49,46 @@ public abstract class CollectionParameter<TParameterizedType, TParameterInfo> : 
         }
     }
 
+    public void Add(TParameterizedType element)
+    {
+        if (LimitCount > 0 && Value.Count == LimitCount)
+        {
+            OnError($"Текущее количество элементов достигло предела в {LimitCount} элемента(ов)");
+            return;
+        }
+        Value.Add(element);
+
+        OnChange(Value);
+    }
+
+    public void Add(object element)
+    {
+        if (element is TParameterizedType pType)
+            Add(pType);
+    }
+
+    public void Remove(TParameterizedType element)
+    {
+        if (!Value.Contains(element)) return;
+
+        Value.Remove(element);
+
+        OnChange(Value);
+    }
+
+    public void Remove(object element)
+    {
+        if (element is TParameterizedType pType)
+            Remove(pType);
+    }
+
+    public void Clear()
+    {
+        Value = new List<TParameterizedType>();
+
+        OnChange(Value);
+    }
+
     protected void OnError(string message)
     {
         Error?.Invoke(Info.Name, message);
@@ -40,6 +97,30 @@ public abstract class CollectionParameter<TParameterizedType, TParameterInfo> : 
     protected void OnChange(object value)
     {
         Change?.Invoke(Info.Name, value);
+    }
+
+    object ICollectionParameter.this[int index]
+    {
+        get => this[index]!;
+        set => this[index] = (TParameterizedType)value;
+    }
+
+    public TParameterizedType this[int index]
+    {
+        get
+        {
+            if(index < 0 || index >= Value.Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            return Value.ToArray()[index];
+        }
+        set
+        {
+            if (index < 0 || index >= Value.Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            Value.ToArray()[index] = value;
+        }
     }
 
     #region OverridesRegion
@@ -71,4 +152,3 @@ public abstract class CollectionParameter<TParameterizedType, TParameterInfo> : 
 
     #endregion
 }
-

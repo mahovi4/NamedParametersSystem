@@ -8,6 +8,7 @@ public interface IParameter
     public string Name { get; }
     public string Description { get; }
     public bool ReadOnly { get; }
+    public GroupParameter? Group { get; }
 
     public object ToObj();
     public void FromObj(object value);
